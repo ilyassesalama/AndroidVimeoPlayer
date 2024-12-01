@@ -7,16 +7,16 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.PopupWindow;
 
-import com.ct7ct7ct7.androidvimeoplayer.databinding.PlayerMenuBinding;
-import com.ct7ct7ct7.androidvimeoplayer.R;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.ct7ct7ct7.androidvimeoplayer.R;
+import com.ct7ct7ct7.androidvimeoplayer.databinding.PlayerMenuBinding;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class VimeoPlayerMenu {
 

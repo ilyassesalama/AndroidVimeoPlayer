@@ -5,14 +5,14 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
-import com.ct7ct7ct7.androidvimeoplayer.R;
-
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.ct7ct7ct7.androidvimeoplayer.R;
+
 public class VimeoDividerItemDecoration extends RecyclerView.ItemDecoration {
-    private Drawable mDivider;
+    private final Drawable mDivider;
 
     public VimeoDividerItemDecoration(Context context) {
         mDivider = ContextCompat.getDrawable(context, R.drawable.bg_divider);

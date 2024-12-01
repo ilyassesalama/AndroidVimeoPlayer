@@ -5,7 +5,6 @@ import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -13,31 +12,31 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
+
+import com.ct7ct7ct7.androidvimeoplayer.R;
 import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerErrorListener;
 import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerReadyListener;
-import com.ct7ct7ct7.androidvimeoplayer.model.PlayerState;
-import com.ct7ct7ct7.androidvimeoplayer.model.TextTrack;
-import com.ct7ct7ct7.androidvimeoplayer.utils.JsBridge;
-import com.ct7ct7ct7.androidvimeoplayer.R;
-import com.ct7ct7ct7.androidvimeoplayer.utils.Utils;
-import com.ct7ct7ct7.androidvimeoplayer.model.VimeoOptions;
 import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerStateListener;
 import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerTextTrackListener;
 import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerTimeListener;
 import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerVolumeListener;
+import com.ct7ct7ct7.androidvimeoplayer.model.PlayerState;
+import com.ct7ct7ct7.androidvimeoplayer.model.TextTrack;
+import com.ct7ct7ct7.androidvimeoplayer.model.VimeoOptions;
+import com.ct7ct7ct7.androidvimeoplayer.utils.JsBridge;
+import com.ct7ct7ct7.androidvimeoplayer.utils.Utils;
 import com.ct7ct7ct7.androidvimeoplayer.view.menu.VimeoMenuItem;
-
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.OnLifecycleEvent;
 
 public class VimeoPlayerView extends FrameLayout implements LifecycleObserver {
     public VimeoOptions defaultOptions;
     public int defaultColor = Color.rgb(0, 172, 240);
     public float defaultAspectRatio = 16f / 9;
-    private JsBridge jsBridge;
-    private VimeoPlayer vimeoPlayer;
-    private ProgressBar progressBar;
+    private final JsBridge jsBridge;
+    private final VimeoPlayer vimeoPlayer;
+    private final ProgressBar progressBar;
     private DefaultControlPanelView defaultControlPanelView;
     private String title;
     private int videoId;
@@ -92,11 +91,9 @@ public class VimeoPlayerView extends FrameLayout implements LifecycleObserver {
 
         this.progressBar = new ProgressBar(context);
         if (defaultOptions.color != defaultColor) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                progressBar.setIndeterminate(true);
-                progressBar.setIndeterminateTintMode(PorterDuff.Mode.SRC_ATOP);
-                progressBar.setIndeterminateTintList(ColorStateList.valueOf(defaultOptions.color));
-            }
+            progressBar.setIndeterminate(true);
+            progressBar.setIndeterminateTintMode(PorterDuff.Mode.SRC_ATOP);
+            progressBar.setIndeterminateTintList(ColorStateList.valueOf(defaultOptions.color));
         }
         LayoutParams progressLayoutParams = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         progressLayoutParams.gravity = Gravity.CENTER;
@@ -196,9 +193,7 @@ public class VimeoPlayerView extends FrameLayout implements LifecycleObserver {
 
     public void setTopicColor(int color) {
         defaultOptions.color = color;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            progressBar.setIndeterminateTintList(ColorStateList.valueOf(color));
-        }
+        progressBar.setIndeterminateTintList(ColorStateList.valueOf(color));
         vimeoPlayer.setTopicColor(Utils.colorToHex(color));
         if (defaultControlPanelView != null) {
             defaultControlPanelView.setTopicColor(color);
@@ -412,7 +407,7 @@ public class VimeoPlayerView extends FrameLayout implements LifecycleObserver {
 
     /**
      * @param videoId the video id.
-     * @param baseUrl settings embedded url. e.g. https://yourdomain
+     * @param baseUrl settings embedded url. e.g. <a href="https://yourdomain">...</a>
      */
     public void initialize(boolean enabledCache, int videoId, String baseUrl) {
         this.videoId = videoId;

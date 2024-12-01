@@ -20,7 +20,6 @@ import com.bumptech.glide.request.RequestOptions;
 import com.ct7ct7ct7.androidvimeoplayer.R;
 import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerReadyListener;
 import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerStateListener;
-import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerTimeListener;
 import com.ct7ct7ct7.androidvimeoplayer.model.TextTrack;
 import com.ct7ct7ct7.androidvimeoplayer.model.VimeoThumbnail;
 import com.ct7ct7ct7.androidvimeoplayer.utils.Utils;
@@ -33,20 +32,20 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class DefaultControlPanelView {
-    private View vimeoPanelView;
-    private View vimeoShadeView;
-    private ImageView vimeoMenuButton;
-    private ImageView vimeoFullscreenButton;
-    private SeekBar vimeoSeekBar;
-    private TextView vimeoCurrentTimeTextView;
-    private ImageView vimeoThumbnailImageView;
-    private ImageView vimeoPlayButton;
-    private ImageView vimeoPauseButton;
-    private ImageView vimeoReplayButton;
-    private TextView vimeoTitleTextView;
-    private View controlsRootView;
+    private final View vimeoPanelView;
+    private final View vimeoShadeView;
+    private final ImageView vimeoMenuButton;
+    private final ImageView vimeoFullscreenButton;
+    private final SeekBar vimeoSeekBar;
+    private final TextView vimeoCurrentTimeTextView;
+    private final ImageView vimeoThumbnailImageView;
+    private final ImageView vimeoPlayButton;
+    private final ImageView vimeoPauseButton;
+    private final ImageView vimeoReplayButton;
+    private final TextView vimeoTitleTextView;
+    private final View controlsRootView;
     private boolean ended = false;
-    private VimeoPlayerMenu vimeoPlayerMenu;
+    private final VimeoPlayerMenu vimeoPlayerMenu;
 
     public DefaultControlPanelView(final VimeoPlayerView vimeoPlayerView) {
         View defaultControlPanelView = View.inflate(vimeoPlayerView.getContext(), R.layout.view_default_control_panel, vimeoPlayerView);
@@ -70,34 +69,20 @@ public class DefaultControlPanelView {
         vimeoThumbnailImageView.setVisibility(View.VISIBLE);
         controlsRootView.setVisibility(View.GONE);
 
-        vimeoPauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                vimeoPlayerView.pause();
-                dismissControls(4000);
-            }
+        vimeoPauseButton.setOnClickListener(v -> {
+            vimeoPlayerView.pause();
+            dismissControls(4000);
         });
-        vimeoPlayButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                vimeoPlayerView.play();
-            }
-        });
-        vimeoReplayButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                vimeoPlayerView.seekTo(0);
-                vimeoPlayerView.play();
-            }
+        vimeoPlayButton.setOnClickListener(v -> vimeoPlayerView.play());
+        vimeoReplayButton.setOnClickListener(v -> {
+            vimeoPlayerView.seekTo(0);
+            vimeoPlayerView.play();
         });
 
 
-        vimeoPlayerView.addTimeListener(new VimeoPlayerTimeListener() {
-            @Override
-            public void onCurrentSecond(float second) {
-                vimeoCurrentTimeTextView.setText(Utils.formatTime(second));
-                vimeoSeekBar.setProgress((int) second);
-            }
+        vimeoPlayerView.addTimeListener(second -> {
+            vimeoCurrentTimeTextView.setText(Utils.formatTime(second));
+            vimeoSeekBar.setProgress((int) second);
         });
 
         vimeoPlayerView.addReadyListener(new VimeoPlayerReadyListener() {
@@ -178,23 +163,13 @@ public class DefaultControlPanelView {
             }
         });
 
-        vimeoPanelView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showControls(true);
-            }
-        });
+        vimeoPanelView.setOnClickListener(v -> showControls(true));
 
         vimeoMenuButton.setVisibility(vimeoPlayerView.defaultOptions.menuOption ? View.VISIBLE : View.GONE);
         vimeoFullscreenButton.setVisibility(vimeoPlayerView.defaultOptions.fullscreenOption ? View.VISIBLE : View.GONE);
 
 
-        vimeoMenuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                vimeoPlayerMenu.show(vimeoMenuButton);
-            }
-        });
+        vimeoMenuButton.setOnClickListener(v -> vimeoPlayerMenu.show(vimeoMenuButton));
     }
 
     private final Handler handler = new Handler(Looper.getMainLooper());
