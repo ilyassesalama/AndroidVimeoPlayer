@@ -1,4 +1,4 @@
-<manifest package="com.ct7ct7ct7.androidvimeoplayer"
+<manifest
           xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET"/>
