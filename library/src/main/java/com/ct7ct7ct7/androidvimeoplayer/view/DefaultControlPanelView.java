@@ -1,10 +1,8 @@
 package com.ct7ct7ct7.androidvimeoplayer.view;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -13,9 +11,6 @@ import android.view.View;
 import android.widget.SeekBar;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.Priority;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
 import com.ct7ct7ct7.androidvimeoplayer.databinding.ViewDefaultControlPanelBinding;
 import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerReadyListener;
 import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerStateListener;
@@ -25,6 +20,9 @@ import com.ct7ct7ct7.androidvimeoplayer.utils.Utils;
 import com.ct7ct7ct7.androidvimeoplayer.view.menu.VimeoMenuItem;
 import com.ct7ct7ct7.androidvimeoplayer.view.menu.VimeoPlayerMenu;
 import com.google.gson.Gson;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -42,6 +40,8 @@ public class DefaultControlPanelView {
             binding.controlsRootView.setVisibility(View.GONE);
         }
     };
+
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public DefaultControlPanelView(final VimeoPlayerView vimeoPlayerView) {
         binding = ViewDefaultControlPanelBinding.inflate(
@@ -211,38 +211,26 @@ public class DefaultControlPanelView {
         binding.vimeoSeekBar.getProgressDrawable().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
     }
 
-    @SuppressLint("StaticFieldLeak")
     protected void fetchThumbnail(final Context context, final int videoId) {
-        new AsyncTask<Void, Void, VimeoThumbnail>() {
-            @Override
-            protected VimeoThumbnail doInBackground(Void... voids) {
-                String url = "https://vimeo.com/api/oembed.json?url=https://player.vimeo.com/video/" + videoId;
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().url(url).build();
-                VimeoThumbnail vimeoThumbnail = null;
-                try {
-                    Response response = client.newCall(request).execute();
-                    vimeoThumbnail = new Gson().fromJson(response.body().string(), VimeoThumbnail.class);
-                } catch (Exception e) {
-                    Log.e(context.getPackageName(), e.toString());
-                }
-                return vimeoThumbnail;
+        executorService.execute(() -> {
+            String url = "https://vimeo.com/api/oembed.json?url=https://player.vimeo.com/video/" + videoId;
+            OkHttpClient client = new OkHttpClient();
+            Request request = new Request.Builder().url(url).build();
+            VimeoThumbnail vimeoThumbnail = null;
+            try {
+                Response response = client.newCall(request).execute();
+                vimeoThumbnail = new Gson().fromJson(response.body().string(), VimeoThumbnail.class);
+            } catch (Exception e) {
+                Log.e(context.getPackageName(), e.toString());
             }
-
-            @Override
-            protected void onPostExecute(VimeoThumbnail vimeoThumbnail) {
-                super.onPostExecute(vimeoThumbnail);
-                if (vimeoThumbnail != null && vimeoThumbnail.thumbnailUrl != null) {
-                    RequestOptions options = new RequestOptions()
-                            .priority(Priority.NORMAL)
-                            .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC);
-
+            final VimeoThumbnail finalVimeoThumbnail = vimeoThumbnail;
+            handler.post(() -> {
+                if (finalVimeoThumbnail != null && finalVimeoThumbnail.thumbnailUrl != null) {
                     Glide.with(context)
-                            .load(vimeoThumbnail.thumbnailUrl)
-                            .apply(options)
+                            .load(finalVimeoThumbnail.thumbnailUrl)
                             .into(binding.vimeoThumbnailImageView);
                 }
-            }
-        }.execute();
+            });
+        });
     }
 }
