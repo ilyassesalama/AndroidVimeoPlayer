@@ -7,13 +7,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 
-public class ViemoMenuItem {
+public class VimeoMenuItem {
 
     private final String text;
     @DrawableRes private final int icon;
     private final View.OnClickListener onClickListener;
 
-    public ViemoMenuItem(@NonNull String text, @DrawableRes final int icon, @Nullable View.OnClickListener onClickListener) {
+    public VimeoMenuItem(@NonNull String text, @DrawableRes final int icon, @Nullable View.OnClickListener onClickListener) {
         this.text = text;
         this.icon = icon;
         this.onClickListener = onClickListener;
@@ -38,7 +38,7 @@ public class ViemoMenuItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ViemoMenuItem menuItem = (ViemoMenuItem) o;
+        VimeoMenuItem menuItem = (VimeoMenuItem) o;
 
         return icon == menuItem.icon && text.equals(menuItem.text);
     }

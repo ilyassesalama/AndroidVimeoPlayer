@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.PopupWindow;
 
-
+import com.ct7ct7ct7.androidvimeoplayer.databinding.PlayerMenuBinding;
 import com.ct7ct7ct7.androidvimeoplayer.R;
 
 import java.util.ArrayList;
@@ -18,23 +18,22 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-
-public class ViemoPlayerMenu {
+public class VimeoPlayerMenu {
 
     private final Context context;
-    private final List<ViemoMenuItem> menuItems;
+    private final List<VimeoMenuItem> menuItems;
 
-    @Nullable private PopupWindow popupWindow;
+    @Nullable
+    private PopupWindow popupWindow;
 
-    public ViemoPlayerMenu(@NonNull Context context) {
+    public VimeoPlayerMenu(@NonNull Context context) {
         this.context = context;
-
         this.menuItems = new ArrayList<>();
     }
 
     public void show(View anchorView) {
         popupWindow = createPopupWindow();
-        popupWindow.showAsDropDown(anchorView, 0, - context.getResources().getDimensionPixelSize(R.dimen._8dp) * 4);
+        popupWindow.showAsDropDown(anchorView, 0, -context.getResources().getDimensionPixelSize(R.dimen._8dp) * 4);
     }
 
     public void dismiss() {
@@ -42,7 +41,7 @@ public class ViemoPlayerMenu {
             popupWindow.dismiss();
     }
 
-    public void addItem(ViemoMenuItem menuItem) {
+    public void addItem(VimeoMenuItem menuItem) {
         menuItems.add(menuItem);
     }
 
@@ -56,21 +55,17 @@ public class ViemoPlayerMenu {
 
     @NonNull
     private PopupWindow createPopupWindow() {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        PlayerMenuBinding binding = PlayerMenuBinding.inflate(LayoutInflater.from(context));
 
-        if(inflater == null)
-            throw new RuntimeException("can't access LAYOUT_INFLATER_SERVICE");
+        setUpRecyclerView(binding.recyclerView);
 
-        View view = inflater.inflate(R.layout.player_menu, null);
-
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
-        setUpRecyclerView(recyclerView);
-
-        PopupWindow popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        PopupWindow popupWindow = new PopupWindow(binding.getRoot(),
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
         popupWindow.setFocusable(true);
         popupWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
         popupWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
-        popupWindow.setContentView(view);
+        popupWindow.setContentView(binding.getRoot());
 
         return popupWindow;
     }

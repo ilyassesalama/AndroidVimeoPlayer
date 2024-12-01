@@ -25,7 +25,7 @@ import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerStateListener;
 import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerTextTrackListener;
 import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerTimeListener;
 import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerVolumeListener;
-import com.ct7ct7ct7.androidvimeoplayer.view.menu.ViemoMenuItem;
+import com.ct7ct7ct7.androidvimeoplayer.view.menu.VimeoMenuItem;
 
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
@@ -258,7 +258,7 @@ public class VimeoPlayerView extends FrameLayout implements LifecycleObserver {
         }
     }
 
-    public void addMenuItem(ViemoMenuItem menuItem) {
+    public void addMenuItem(VimeoMenuItem menuItem) {
         if (defaultControlPanelView != null) {
             defaultControlPanelView.addMenuItem(menuItem);
         }

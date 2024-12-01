@@ -98,20 +98,12 @@ public class VimeoPlayerActivity extends AppCompatActivity {
 
             }
         });
-        vimeoPlayerView.addTimeListener(new VimeoPlayerTimeListener() {
-            @Override
-            public void onCurrentSecond(float second) {
-                if (second >= endAt) {
-                    vimeoPlayerView.pause();
-                }
+        vimeoPlayerView.addTimeListener(second -> {
+            if (second >= endAt) {
+                vimeoPlayerView.pause();
             }
         });
-        vimeoPlayerView.setFullscreenClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        vimeoPlayerView.setFullscreenClickListener(v -> onBackPressed());
     }
 
     @Override

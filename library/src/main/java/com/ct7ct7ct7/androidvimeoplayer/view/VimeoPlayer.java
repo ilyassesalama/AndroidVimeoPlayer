@@ -47,49 +47,34 @@ public class VimeoPlayer extends WebView {
 
     public void loadVideo(final int videoId) {
         String script = "javascript:loadVideo('" + videoId + "')";
-        evaluateJavascript(script, new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String value) {
+        evaluateJavascript(script, value -> {
 
-            }
         });
     }
 
     public void playTwoStage() {
-        evaluateJavascript("javascript:playTwoStage()", new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String value) {
+        evaluateJavascript("javascript:playTwoStage()", value -> {
 
-            }
         });
     }
 
     public void play() {
-        evaluateJavascript("javascript:playVideo()", new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String value) {
+        evaluateJavascript("javascript:playVideo()", value -> {
 
-            }
         });
     }
 
     public void pause() {
-        evaluateJavascript("javascript:pauseVideo()", new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String value) {
+        evaluateJavascript("javascript:pauseVideo()", value -> {
 
-            }
         });
     }
 
 
     public void seekTo(final float time) {
         String script = "javascript:seekTo(" + time + ")";
-        evaluateJavascript(script, new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String value) {
+        evaluateJavascript(script, value -> {
 
-            }
         });
     }
 
@@ -111,73 +96,52 @@ public class VimeoPlayer extends WebView {
 
     public void setVolume(final float volume) {
         String script = "javascript:setVolume(" + volume + ")";
-        evaluateJavascript(script, new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String value) {
+        evaluateJavascript(script, value -> {
 
-            }
         });
     }
 
 
     public void setTopicColor(final String hexColor) {
         String script = "javascript:setColor('" + hexColor + "')";
-        evaluateJavascript(script, new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String value) {
+        evaluateJavascript(script, value -> {
 
-            }
         });
     }
 
 
     public void setLoop(final boolean loop) {
         String script = "javascript:setLoop(" + loop + ")";
-        evaluateJavascript(script, new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String value) {
+        evaluateJavascript(script, value -> {
 
-            }
         });
     }
 
 
     public void setPlaybackRate(final float playbackRate) {
         String script = "javascript:setPlaybackRate(" + playbackRate + ")";
-        evaluateJavascript(script, new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String value) {
+        evaluateJavascript(script, value -> {
 
-            }
         });
     }
 
 
     public void setCaptions(final String language) {
-        evaluateJavascript("javascript:setCaptions('" + language + "')", new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String value) {
+        evaluateJavascript("javascript:setCaptions('" + language + "')", value -> {
 
-            }
         });
     }
 
     public void disableCaptions() {
-        evaluateJavascript("javascript:disableCaptions()", new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String value) {
+        evaluateJavascript("javascript:disableCaptions()", value -> {
 
-            }
         });
     }
 
 
     protected void destroyPlayer() {
-        evaluateJavascript("javascript:destroyPlayer()", new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String value) {
+        evaluateJavascript("javascript:destroyPlayer()", value -> {
 
-            }
         });
     }
 
@@ -193,14 +157,11 @@ public class VimeoPlayer extends WebView {
             this.getSettings().setDatabaseEnabled(true);
             this.getSettings().setDomStorageEnabled(true);
             this.getSettings().setAllowFileAccess(true);
-            this.getSettings().setAppCacheEnabled(true);
-            this.getSettings().setAppCachePath(this.getContext().getCacheDir().getAbsolutePath());
         } else {
             this.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
             this.getSettings().setDatabaseEnabled(false);
             this.getSettings().setDomStorageEnabled(false);
             this.getSettings().setAllowFileAccess(false);
-            this.getSettings().setAppCacheEnabled(false);
         }
 
         this.addJavascriptInterface(jsBridge, "JsBridge");
@@ -247,11 +208,8 @@ public class VimeoPlayer extends WebView {
         WebViewClient webViewClient = new WebViewClient() {
             @Override
             public void onPageFinished(WebView webView, String url) {
-                webView.evaluateJavascript("javascript:initVimeoPlayer()", new ValueCallback<String>() {
-                    @Override
-                    public void onReceiveValue(String value) {
+                webView.evaluateJavascript("javascript:initVimeoPlayer()", value -> {
 
-                    }
                 });
             }
         };

@@ -18,9 +18,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.ViewHolder> {
     @NonNull private final Context context;
-    @NonNull private final List<ViemoMenuItem> menuItems;
+    @NonNull private final List<VimeoMenuItem> menuItems;
 
-    MenuAdapter(@NonNull Context context, @NonNull List<ViemoMenuItem> menuItems) {
+    MenuAdapter(@NonNull Context context, @NonNull List<VimeoMenuItem> menuItems) {
         this.context = context;
         this.menuItems = menuItems;
     }
