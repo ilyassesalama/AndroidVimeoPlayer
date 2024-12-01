@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.OnLifecycleEvent;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.DefaultLifecycleObserver;
+import androidx.lifecycle.LifecycleOwner;
 
 import com.ct7ct7ct7.androidvimeoplayer.R;
 import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerErrorListener;
@@ -30,13 +30,13 @@ import com.ct7ct7ct7.androidvimeoplayer.utils.JsBridge;
 import com.ct7ct7ct7.androidvimeoplayer.utils.Utils;
 import com.ct7ct7ct7.androidvimeoplayer.view.menu.VimeoMenuItem;
 
-public class VimeoPlayerView extends FrameLayout implements LifecycleObserver {
-    public VimeoOptions defaultOptions;
-    public int defaultColor = Color.rgb(0, 172, 240);
-    public float defaultAspectRatio = 16f / 9;
+public class VimeoPlayerView extends FrameLayout implements DefaultLifecycleObserver {
     private final JsBridge jsBridge;
     private final VimeoPlayer vimeoPlayer;
     private final ProgressBar progressBar;
+    public VimeoOptions defaultOptions;
+    public int defaultColor = Color.rgb(0, 172, 240);
+    public float defaultAspectRatio = 16f / 9;
     private DefaultControlPanelView defaultControlPanelView;
     private String title;
     private int videoId;
@@ -191,6 +191,10 @@ public class VimeoPlayerView extends FrameLayout implements LifecycleObserver {
         return title;
     }
 
+    public int getTopicColor() {
+        return defaultOptions.color;
+    }
+
     public void setTopicColor(int color) {
         defaultOptions.color = color;
         progressBar.setIndeterminateTintList(ColorStateList.valueOf(color));
@@ -200,17 +204,13 @@ public class VimeoPlayerView extends FrameLayout implements LifecycleObserver {
         }
     }
 
-    public int getTopicColor() {
-        return defaultOptions.color;
+    public boolean getLoop() {
+        return defaultOptions.loop;
     }
 
     public void setLoop(boolean loop) {
         defaultOptions.loop = loop;
         vimeoPlayer.setLoop(loop);
-    }
-
-    public boolean getLoop() {
-        return defaultOptions.loop;
     }
 
     public TextTrack[] getTextTracks() {
@@ -230,13 +230,6 @@ public class VimeoPlayerView extends FrameLayout implements LifecycleObserver {
     public void setFullscreenClickListener(final OnClickListener onClickListener) {
         if (defaultControlPanelView != null) {
             defaultControlPanelView.setFullscreenClickListener(onClickListener);
-        }
-    }
-
-    public void setFullscreenVisibility(boolean show) {
-        if (defaultControlPanelView != null) {
-            defaultOptions.fullscreenOption = show;
-            defaultControlPanelView.setFullscreenVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -287,6 +280,13 @@ public class VimeoPlayerView extends FrameLayout implements LifecycleObserver {
         return defaultOptions.fullscreenOption;
     }
 
+    public void setFullscreenVisibility(boolean show) {
+        if (defaultControlPanelView != null) {
+            defaultOptions.fullscreenOption = show;
+            defaultControlPanelView.setFullscreenVisibility(show ? View.VISIBLE : View.GONE);
+        }
+    }
+
     /**
      * @param playbackRate 0.5 to 2
      */
@@ -313,13 +313,13 @@ public class VimeoPlayerView extends FrameLayout implements LifecycleObserver {
         return jsBridge.playerState;
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    public void onDestroy() {
+    @Override
+    public void onDestroy(@NonNull LifecycleOwner owner) {
         recycle();
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    public void onStop() {
+    @Override
+    public void onStop(@NonNull LifecycleOwner owner) {
         vimeoPlayer.pause();
     }
 
