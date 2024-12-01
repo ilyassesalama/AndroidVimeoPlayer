@@ -8,16 +8,15 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.SeekBar;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-import com.ct7ct7ct7.androidvimeoplayer.R;
+import com.ct7ct7ct7.androidvimeoplayer.databinding.ViewDefaultControlPanelBinding;
 import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerReadyListener;
 import com.ct7ct7ct7.androidvimeoplayer.listeners.VimeoPlayerStateListener;
 import com.ct7ct7ct7.androidvimeoplayer.model.TextTrack;
@@ -32,67 +31,53 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class DefaultControlPanelView {
-    private final View vimeoPanelView;
-    private final View vimeoShadeView;
-    private final ImageView vimeoMenuButton;
-    private final ImageView vimeoFullscreenButton;
-    private final SeekBar vimeoSeekBar;
-    private final TextView vimeoCurrentTimeTextView;
-    private final ImageView vimeoThumbnailImageView;
-    private final ImageView vimeoPlayButton;
-    private final ImageView vimeoPauseButton;
-    private final ImageView vimeoReplayButton;
-    private final TextView vimeoTitleTextView;
-    private final View controlsRootView;
+    private final ViewDefaultControlPanelBinding binding;
     private boolean ended = false;
     private final VimeoPlayerMenu vimeoPlayerMenu;
 
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Runnable dismissRunnable = new Runnable() {
+        @Override
+        public void run() {
+            binding.controlsRootView.setVisibility(View.GONE);
+        }
+    };
+
     public DefaultControlPanelView(final VimeoPlayerView vimeoPlayerView) {
-        View defaultControlPanelView = View.inflate(vimeoPlayerView.getContext(), R.layout.view_default_control_panel, vimeoPlayerView);
-        vimeoPanelView = defaultControlPanelView.findViewById(R.id.vimeoPanelView);
-        vimeoShadeView = defaultControlPanelView.findViewById(R.id.vimeoShadeView);
-        vimeoMenuButton = defaultControlPanelView.findViewById(R.id.vimeoMenuButton);
-        vimeoFullscreenButton = defaultControlPanelView.findViewById(R.id.vimeoFullscreenButton);
-        vimeoSeekBar = defaultControlPanelView.findViewById(R.id.vimeoSeekBar);
-        vimeoCurrentTimeTextView = defaultControlPanelView.findViewById(R.id.vimeoCurrentTimeTextView);
-        vimeoThumbnailImageView = defaultControlPanelView.findViewById(R.id.vimeoThumbnailImageView);
-        vimeoPlayButton = defaultControlPanelView.findViewById(R.id.vimeoPlayButton);
-        vimeoPauseButton = defaultControlPanelView.findViewById(R.id.vimeoPauseButton);
-        vimeoReplayButton = defaultControlPanelView.findViewById(R.id.vimeoReplayButton);
-        vimeoTitleTextView = defaultControlPanelView.findViewById(R.id.vimeoTitleTextView);
-        controlsRootView = defaultControlPanelView.findViewById(R.id.controlsRootView);
+        binding = ViewDefaultControlPanelBinding.inflate(
+                LayoutInflater.from(vimeoPlayerView.getContext()), vimeoPlayerView, true);
+
         vimeoPlayerMenu = new VimeoPlayerMenu(vimeoPlayerView.getContext());
 
-        vimeoSeekBar.setVisibility(View.INVISIBLE);
-        vimeoPanelView.setVisibility(View.VISIBLE);
-        vimeoShadeView.setVisibility(View.VISIBLE);
-        vimeoThumbnailImageView.setVisibility(View.VISIBLE);
-        controlsRootView.setVisibility(View.GONE);
+        binding.vimeoSeekBar.setVisibility(View.INVISIBLE);
+        binding.vimeoPanelView.setVisibility(View.VISIBLE);
+        binding.vimeoShadeView.setVisibility(View.VISIBLE);
+        binding.vimeoThumbnailImageView.setVisibility(View.VISIBLE);
+        binding.controlsRootView.setVisibility(View.GONE);
 
-        vimeoPauseButton.setOnClickListener(v -> {
+        binding.vimeoPauseButton.setOnClickListener(v -> {
             vimeoPlayerView.pause();
             dismissControls(4000);
         });
-        vimeoPlayButton.setOnClickListener(v -> vimeoPlayerView.play());
-        vimeoReplayButton.setOnClickListener(v -> {
+        binding.vimeoPlayButton.setOnClickListener(v -> vimeoPlayerView.play());
+        binding.vimeoReplayButton.setOnClickListener(v -> {
             vimeoPlayerView.seekTo(0);
             vimeoPlayerView.play();
         });
 
-
         vimeoPlayerView.addTimeListener(second -> {
-            vimeoCurrentTimeTextView.setText(Utils.formatTime(second));
-            vimeoSeekBar.setProgress((int) second);
+            binding.vimeoCurrentTimeTextView.setText(Utils.formatTime(second));
+            binding.vimeoSeekBar.setProgress((int) second);
         });
 
         vimeoPlayerView.addReadyListener(new VimeoPlayerReadyListener() {
             @Override
             public void onReady(String title, float duration, TextTrack[] textTrackArray) {
-                vimeoSeekBar.setMax((int) duration);
-                vimeoTitleTextView.setText(title);
-                vimeoPanelView.setVisibility(View.VISIBLE);
-                controlsRootView.setVisibility(View.VISIBLE);
-                vimeoShadeView.setVisibility(View.GONE);
+                binding.vimeoSeekBar.setMax((int) duration);
+                binding.vimeoTitleTextView.setText(title);
+                binding.vimeoPanelView.setVisibility(View.VISIBLE);
+                binding.controlsRootView.setVisibility(View.VISIBLE);
+                binding.vimeoShadeView.setVisibility(View.GONE);
             }
 
             @Override
@@ -105,48 +90,51 @@ public class DefaultControlPanelView {
             @Override
             public void onPlaying(float duration) {
                 ended = false;
-                vimeoSeekBar.setVisibility(View.VISIBLE);
-                vimeoPanelView.setBackgroundColor(Color.TRANSPARENT);
-                vimeoPauseButton.setVisibility(View.VISIBLE);
-                vimeoPlayButton.setVisibility(View.GONE);
-                vimeoReplayButton.setVisibility(View.GONE);
-                vimeoThumbnailImageView.setVisibility(View.GONE);
+                binding.vimeoSeekBar.setVisibility(View.VISIBLE);
+                binding.vimeoPanelView.setBackgroundColor(Color.TRANSPARENT);
+                binding.vimeoPauseButton.setVisibility(View.VISIBLE);
+                binding.vimeoPlayButton.setVisibility(View.GONE);
+                binding.vimeoReplayButton.setVisibility(View.GONE);
+                binding.vimeoThumbnailImageView.setVisibility(View.GONE);
                 dismissControls(4000);
             }
 
             @Override
             public void onPaused(float seconds) {
                 if (ended) {
-                    vimeoPanelView.setBackgroundColor(Color.BLACK);
-                    vimeoReplayButton.setVisibility(View.VISIBLE);
-                    vimeoPauseButton.setVisibility(View.GONE);
-                    vimeoPlayButton.setVisibility(View.GONE);
+                    binding.vimeoPanelView.setBackgroundColor(Color.BLACK);
+                    binding.vimeoReplayButton.setVisibility(View.VISIBLE);
+                    binding.vimeoPauseButton.setVisibility(View.GONE);
+                    binding.vimeoPlayButton.setVisibility(View.GONE);
                 } else {
-                    vimeoReplayButton.setVisibility(View.GONE);
-                    vimeoPauseButton.setVisibility(View.GONE);
-                    vimeoPlayButton.setVisibility(View.VISIBLE);
+                    binding.vimeoReplayButton.setVisibility(View.GONE);
+                    binding.vimeoPauseButton.setVisibility(View.GONE);
+                    binding.vimeoPlayButton.setVisibility(View.VISIBLE);
                 }
             }
 
             @Override
             public void onEnded(float duration) {
                 ended = true;
-                vimeoThumbnailImageView.setVisibility(View.VISIBLE);
+                binding.vimeoThumbnailImageView.setVisibility(View.VISIBLE);
                 showControls(false);
             }
         });
 
-        vimeoTitleTextView.setVisibility(vimeoPlayerView.defaultOptions.title ? View.VISIBLE : View.INVISIBLE);
+        binding.vimeoTitleTextView.setVisibility(
+                vimeoPlayerView.defaultOptions.title ? View.VISIBLE : View.INVISIBLE);
 
         if (vimeoPlayerView.defaultOptions.color != vimeoPlayerView.defaultColor) {
-            vimeoSeekBar.getThumb().setColorFilter(vimeoPlayerView.defaultOptions.color, PorterDuff.Mode.SRC_ATOP);
-            vimeoSeekBar.getProgressDrawable().setColorFilter(vimeoPlayerView.defaultOptions.color, PorterDuff.Mode.SRC_ATOP);
+            binding.vimeoSeekBar.getThumb().setColorFilter(
+                    vimeoPlayerView.defaultOptions.color, PorterDuff.Mode.SRC_ATOP);
+            binding.vimeoSeekBar.getProgressDrawable().setColorFilter(
+                    vimeoPlayerView.defaultOptions.color, PorterDuff.Mode.SRC_ATOP);
         }
 
-        vimeoSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        binding.vimeoSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                vimeoCurrentTimeTextView.setText(Utils.formatTime(progress));
+                binding.vimeoCurrentTimeTextView.setText(Utils.formatTime(progress));
             }
 
             @Override
@@ -163,48 +151,39 @@ public class DefaultControlPanelView {
             }
         });
 
-        vimeoPanelView.setOnClickListener(v -> showControls(true));
+        binding.vimeoPanelView.setOnClickListener(v -> showControls(true));
 
-        vimeoMenuButton.setVisibility(vimeoPlayerView.defaultOptions.menuOption ? View.VISIBLE : View.GONE);
-        vimeoFullscreenButton.setVisibility(vimeoPlayerView.defaultOptions.fullscreenOption ? View.VISIBLE : View.GONE);
+        binding.vimeoMenuButton.setVisibility(
+                vimeoPlayerView.defaultOptions.menuOption ? View.VISIBLE : View.GONE);
+        binding.vimeoFullscreenButton.setVisibility(
+                vimeoPlayerView.defaultOptions.fullscreenOption ? View.VISIBLE : View.GONE);
 
-
-        vimeoMenuButton.setOnClickListener(v -> vimeoPlayerMenu.show(vimeoMenuButton));
+        binding.vimeoMenuButton.setOnClickListener(v -> vimeoPlayerMenu.show(binding.vimeoMenuButton));
     }
-
-    private final Handler handler = new Handler(Looper.getMainLooper());
-    private final Runnable dismissRunnable = new Runnable() {
-        @Override
-        public void run() {
-            controlsRootView.setVisibility(View.GONE);
-        }
-    };
 
     public void dismissControls(final int duration) {
         handler.removeCallbacks(dismissRunnable);
-
         handler.postDelayed(dismissRunnable, duration);
     }
 
     public void showControls(final boolean autoMask) {
         handler.removeCallbacks(dismissRunnable);
-
-        controlsRootView.setVisibility(View.VISIBLE);
+        binding.controlsRootView.setVisibility(View.VISIBLE);
         if (autoMask) {
             dismissControls(3000);
         }
     }
 
     public void setFullscreenVisibility(int value) {
-        vimeoFullscreenButton.setVisibility(value);
+        binding.vimeoFullscreenButton.setVisibility(value);
     }
 
     public void setFullscreenClickListener(final View.OnClickListener onClickListener) {
-        vimeoFullscreenButton.setOnClickListener(onClickListener);
+        binding.vimeoFullscreenButton.setOnClickListener(onClickListener);
     }
 
     public void setMenuVisibility(int value) {
-        vimeoMenuButton.setVisibility(value);
+        binding.vimeoMenuButton.setVisibility(value);
     }
 
     public void addMenuItem(VimeoMenuItem menuItem) {
@@ -224,12 +203,12 @@ public class DefaultControlPanelView {
     }
 
     public void setMenuClickListener(final View.OnClickListener onClickListener) {
-        vimeoMenuButton.setOnClickListener(onClickListener);
+        binding.vimeoMenuButton.setOnClickListener(onClickListener);
     }
 
     public void setTopicColor(int color) {
-        vimeoSeekBar.getThumb().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-        vimeoSeekBar.getProgressDrawable().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        binding.vimeoSeekBar.getThumb().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        binding.vimeoSeekBar.getProgressDrawable().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -261,7 +240,7 @@ public class DefaultControlPanelView {
                     Glide.with(context)
                             .load(vimeoThumbnail.thumbnailUrl)
                             .apply(options)
-                            .into(vimeoThumbnailImageView);
+                            .into(binding.vimeoThumbnailImageView);
                 }
             }
         }.execute();
